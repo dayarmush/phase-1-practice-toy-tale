@@ -32,6 +32,7 @@ function renderToys(toy) {
     cardDiv.appendChild(h2)
 
     img.src = toy.image
+    img.alt = toy.name
     img.setAttribute('class', 'toy-avatar')
     cardDiv.appendChild(img)
 
@@ -43,6 +44,30 @@ function renderToys(toy) {
     cardDiv.appendChild(btn)
 
     document.querySelector('#toy-collection').appendChild(cardDiv)
+//toy obj to pass to patch
+    const toyObj = {
+      'id': toy.id,
+      'name': toy.name,
+      'image': toy.image,
+      'likes': `${toy.likes}`
+    }
+//event listener to update likes and persist
+    btn.addEventListener('click', e => {
+      const likeNumber = p.textContent = `${++toy.likes} likes`
+      console.log(toyObj)
+      fetch(`http://localhost:3000/toys/${toyObj.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          'likes': Number.parseInt(likeNumber)
+        })
+      })
+        .then(response => response.json())
+        .then(data => console.log(data))
+    })
 }
 
 //grabs toy data from form and add it to dom
@@ -54,7 +79,7 @@ function addNewToy() {
     const newToy = {
       'name': e.target.name.value,
       'image': e.target.image.value,
-      'likes': 0
+      'likes': 0,
     };
     fetch('http://localhost:3000/toys', {
       method: 'POST',
